@@ -9,7 +9,7 @@ type error = { error: { status: number; message: string } };
 
 const Express = express();
 const { client_id, client_secret } = process.env as { [key: string]: string };
-const redirect_uri = 'http://localhost:8080/callback';
+const redirect_uri = 'https://spotify-api-three.vercel.app/callback';
 
 let state: string;
 let a_token: string;
