@@ -8,7 +8,9 @@
 		"build": "rimraf dist && tsc",
 		"ts.check": "tsc --project tsconfig.json",
 		"add-build": "git add dist",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"lint": "eslint --ext .ts --fix src",
+    	"prettier": "prettier --write src"
 	},
 	"pre-commit": [
 		"ts.check",
