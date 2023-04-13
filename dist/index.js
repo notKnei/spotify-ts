@@ -16,8 +16,7 @@ require("dotenv/config");
 const node_crypto_1 = __importDefault(require("node:crypto"));
 const express_1 = __importDefault(require("express"));
 const Express = (0, express_1.default)();
-const { client_id, client_secret } = process.env;
-const redirect_uri = 'https://spotify-api-three.vercel.app/callback';
+const { client_id, client_secret, redirect_uri } = process.env;
 let state;
 let a_token;
 let r_token;
@@ -51,8 +50,8 @@ Express.get('/callback', (req, res) => __awaiter(void 0, void 0, void 0, functio
         console.error('Missing code');
         return res.status(403).send({ success: false, cause: 'Missing Code' });
     }
-    res.status(200).send({ success: true, message: 'You can close this page now.' });
-    setInterval(() => getToken(res, r_token), (getToken(res, code) - 30) * 1e3);
+    setInterval(() => getToken({}, r_token), (getToken(res, code) - 30) * 1e3);
+    return;
 }));
 Express.get('/currentPlayingTrack', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,7 +77,7 @@ Express.get('/currentPlayingTrack', (req, res) => __awaiter(void 0, void 0, void
         return res.status(200).send({
             success: true,
             data: {
-                album: current.album,
+                album: cleanAlbumData(current.album),
                 artists: current.artists,
                 id: current.id,
                 image: current.album.images,
@@ -91,7 +90,7 @@ Express.get('/currentPlayingTrack', (req, res) => __awaiter(void 0, void 0, void
         return res.status(200).send({
             success: true,
             data: {
-                album: previous.album,
+                album: cleanAlbumData(previous.album),
                 artists: previous.artists,
                 id: previous.id,
                 image: previous.album.images,
@@ -99,7 +98,7 @@ Express.get('/currentPlayingTrack', (req, res) => __awaiter(void 0, void 0, void
             },
         });
     }
-    return res.send({
+    return res.status(400).send({
         success: false,
         message: 'uh oh, maybe try going to /login first?',
         data: null,
@@ -130,15 +129,20 @@ function getToken(response, code) {
     })
         .catch((err) => {
         console.error(err);
-        response.redirect('/#' +
-            new URLSearchParams({
-                error: 'fetch_error',
-            }).toString());
+        if (response.keys().length !== 0)
+            response.redirect('/#' +
+                new URLSearchParams({
+                    error: 'fetch_error',
+                }).toString());
     });
     return validFor;
 }
 function isError(a) {
     // @ts-expect-error Unknown
     return !!a.error;
+}
+function cleanAlbumData(album) {
+    delete album.available_markets;
+    return album;
 }
 //# sourceMappingURL=index.js.map
