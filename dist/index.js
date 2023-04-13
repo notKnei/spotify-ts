@@ -92,7 +92,7 @@ Express.get('/currentPlayingTrack', async (req, res) => {
     }
     return res.status(400).send({
         success: false,
-        message: 'poop',
+        message: 'null',
         data: null,
     });
 });
