@@ -12,13 +12,13 @@ import type { GetRecentlyPlayedTracksResponse } from 'spotify-web-api-ts/types/t
 type error = { error: { status: number; message: string } };
 
 const Express = express();
-const { client_id, client_secret, redirect_uri } = process.env as { [key: string]: string };
+const { callback, client_id, client_secret, redirect_uri } = process.env as { [key: string]: string };
 
 let state: string;
 let a_token: string;
 let r_token: string;
 
-Express.get('/login', (req, res) => {
+Express.get(callback, (req, res) => {
   state = crypto.randomUUID();
   res.redirect(
     'https://accounts.spotify.com/authorize?' +
@@ -115,7 +115,7 @@ Express.get('/currentPlayingTrack', async (req, res) => {
 
   return res.status(400).send({
     success: false,
-    message: 'uh oh, maybe try going to /login first?',
+    message: 'null',
     data: null,
   });
 });
