@@ -18,9 +18,9 @@ const express_1 = __importDefault(require("express"));
 const Express = (0, express_1.default)();
 const { client_id, client_secret } = process.env;
 const redirect_uri = 'https://spotify-api-three.vercel.app/callback';
-let state;
-let a_token;
-let r_token;
+var state;
+var a_token;
+var r_token;
 Express.get('/login', (req, res) => {
     state = node_crypto_1.default.randomUUID();
     res.redirect('https://accounts.spotify.com/authorize?' +
