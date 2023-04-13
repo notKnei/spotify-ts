@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -18,9 +9,9 @@ const express_1 = __importDefault(require("express"));
 const Express = (0, express_1.default)();
 const { client_id, client_secret } = process.env;
 const redirect_uri = 'https://spotify-api-three.vercel.app/callback';
-var state;
-var a_token;
-var r_token;
+let state;
+let a_token;
+let r_token;
 Express.get('/login', (req, res) => {
     state = node_crypto_1.default.randomUUID();
     res.redirect('https://accounts.spotify.com/authorize?' +
@@ -32,8 +23,7 @@ Express.get('/login', (req, res) => {
             state,
         }).toString());
 });
-Express.get('/callback', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+Express.get('/callback', async (req, res) => {
     if (req.query['state'] !== state) {
         console.error('State Mismatch.');
         return res.redirect('/#' +
@@ -41,39 +31,36 @@ Express.get('/callback', (req, res) => __awaiter(void 0, void 0, void 0, functio
                 error: 'state_mismatch',
             }).toString());
     }
-    const error = (_a = req.query['error']) !== null && _a !== void 0 ? _a : null;
+    const error = req.query['error'] ?? null;
     if (error) {
         console.error('Error: ' + error);
         return res.status(403).send({ success: false, cause: 'Error', error });
     }
-    const code = (_b = req.query['code']) !== null && _b !== void 0 ? _b : null;
+    const code = req.query['code'] ?? null;
     if (!code) {
         console.error('Missing code');
         return res.status(403).send({ success: false, cause: 'Missing Code' });
     }
     setInterval(() => getToken(res, r_token), (getToken(res, code) - 30) * 1e3);
-    console.log(a_token, r_token);
     if (!res.headersSent)
         res.status(200).send({ success: true, message: 'You can close this page now.' });
     return;
-}));
-Express.get('/currentPlayingTrack', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+Express.get('/currentPlayingTrack', async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const songs = yield (function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            const headers = new Headers();
-            headers.set('Authorization', `Bearer ${a_token}`);
-            const song = [null, null];
-            song[0] = yield fetch('https://api.spotify.com/v1/me/player/currently-playing?', {
-                headers,
-            }).then((data) => (data.body === null ? null : data.json()));
-            if (song[0])
-                return song;
-            song[1] = yield fetch('https://api.spotify.com/v1/me/player/recently-played?', {
-                headers,
-            }).then((data) => data.json());
+    const songs = await (async function () {
+        const headers = new Headers();
+        headers.set('Authorization', `Bearer ${a_token}`);
+        const song = [null, null];
+        song[0] = await fetch('https://api.spotify.com/v1/me/player/currently-playing?', {
+            headers,
+        }).then((data) => (data.body === null ? null : data.json()));
+        if (song[0])
             return song;
-        });
+        song[1] = await fetch('https://api.spotify.com/v1/me/player/recently-played?', {
+            headers,
+        }).then((data) => data.json());
+        return song;
     })();
     if (songs[0] !== null && !isError(songs[0])) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -102,13 +89,12 @@ Express.get('/currentPlayingTrack', (req, res) => __awaiter(void 0, void 0, void
             },
         });
     }
-    console.log(songs);
     return res.send({
         success: false,
         message: 'uh oh, maybe try going to /login first?',
         data: null,
     });
-}));
+});
 Express.listen(8080, () => console.log('Online'));
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */ // @ts-expect-error Generics suck
 function getToken(response, code) {
