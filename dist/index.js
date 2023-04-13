@@ -7,11 +7,11 @@ require("dotenv/config");
 const node_crypto_1 = __importDefault(require("node:crypto"));
 const express_1 = __importDefault(require("express"));
 const Express = (0, express_1.default)();
-const { callback, client_id, client_secret, redirect_uri } = process.env;
+const { client_id, client_secret, redirect_uri } = process.env;
 let state;
 let a_token;
 let r_token;
-Express.get(callback, (req, res) => {
+Express.get('/poop', (req, res) => {
     state = node_crypto_1.default.randomUUID();
     res.redirect('https://accounts.spotify.com/authorize?' +
         new URLSearchParams({
