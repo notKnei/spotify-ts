@@ -52,6 +52,7 @@ Express.get('/callback', (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.status(403).send({ success: false, cause: 'Missing Code' });
     }
     setInterval(() => getToken(res, r_token), (getToken(res, code) - 30) * 1e3);
+    console.log(a_token, r_token);
     if (!res.headersSent)
         res.status(200).send({ success: true, message: 'You can close this page now.' });
     return;
