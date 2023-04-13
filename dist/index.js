@@ -101,6 +101,7 @@ Express.get('/currentPlayingTrack', (req, res) => __awaiter(void 0, void 0, void
             },
         });
     }
+    console.log(songs);
     return res.send({
         success: false,
         message: 'uh oh, maybe try going to /login first?',
