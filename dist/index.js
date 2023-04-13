@@ -41,6 +41,10 @@ Express.get('/callback', async (req, res) => {
         return res.status(403).send({ success: false, cause: 'Missing Code' });
     }
     setInterval(() => getToken({}, r_token), (getToken(res, code) - 30) * 1e3);
+    if (!res.headersSent)
+        res
+            .status(200)
+            .send({ success: true, message: 'You can close this page, or head to /curentPlayingTrack' });
     return;
 });
 Express.get('/currentPlayingTrack', async (req, res) => {
