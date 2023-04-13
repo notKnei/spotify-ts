@@ -54,6 +54,11 @@ Express.get('/callback', async (req, res) => {
   setInterval(() => getToken({}, r_token), (getToken(res, code as string) - 30) * 1e3);
 
   return;
+
+  if (!res.headersSent)
+    res.status(200).send({ success: true, message: 'You can close this page now.' });
+
+  return;
 });
 
 Express.get('/currentPlayingTrack', async (req, res) => {
