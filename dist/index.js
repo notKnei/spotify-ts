@@ -51,8 +51,10 @@ Express.get('/callback', (req, res) => __awaiter(void 0, void 0, void 0, functio
         console.error('Missing code');
         return res.status(403).send({ success: false, cause: 'Missing Code' });
     }
-    res.status(200).send({ success: true, message: 'You can close this page now.' });
     setInterval(() => getToken(res, r_token), (getToken(res, code) - 30) * 1e3);
+    if (!res.headersSent)
+        res.status(200).send({ success: true, message: 'You can close this page now.' });
+    return;
 }));
 Express.get('/currentPlayingTrack', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
